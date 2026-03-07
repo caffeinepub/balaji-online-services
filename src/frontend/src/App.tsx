@@ -207,7 +207,7 @@ function HeroSection() {
           className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-4 py-2 text-white text-sm font-medium mb-6"
         >
           <span className="text-yellow-300">⭐</span>
-          Trusted Government Services Center
+          Trusted Services Center
           <span className="text-yellow-300">⭐</span>
         </motion.div>
 
@@ -228,7 +228,7 @@ function HeroSection() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="font-accent text-lg sm:text-2xl text-white/90 mb-8 max-w-2xl mx-auto"
         >
-          Your Trusted Partner for All Government & Online Services
+          Your Trusted Partner for All Online Services
           <br />
           <span className="text-amber-200 font-semibold">
             Haibowal Kalan, Ludhiana
@@ -972,6 +972,41 @@ function Footer() {
   );
 }
 
+// ── WhatsApp Button ───────────────────────────────────────────────────────────
+function WhatsAppButton() {
+  const phone = "919478200010";
+  const message = encodeURIComponent(
+    "Hello! I need help with a service at Balaji Online Services.",
+  );
+  const waUrl = `https://wa.me/${phone}?text=${message}`;
+
+  return (
+    <a
+      href={waUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      data-ocid="whatsapp.button"
+      className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-full shadow-lg transition-all duration-300 hover:scale-105 group"
+      aria-label="Chat on WhatsApp"
+    >
+      {/* WhatsApp SVG icon */}
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 32 32"
+        className="w-6 h-6 fill-white flex-shrink-0"
+        role="img"
+        aria-label="WhatsApp"
+      >
+        <title>WhatsApp</title>
+        <path d="M16 0C7.163 0 0 7.163 0 16c0 2.827.737 5.476 2.027 7.782L0 32l8.418-2.007A15.93 15.93 0 0 0 16 32c8.837 0 16-7.163 16-16S24.837 0 16 0Zm0 29.333a13.28 13.28 0 0 1-6.77-1.852l-.485-.289-5.003 1.194 1.215-4.862-.317-.499A13.3 13.3 0 0 1 2.667 16C2.667 8.636 8.636 2.667 16 2.667S29.333 8.636 29.333 16 23.364 29.333 16 29.333Zm7.293-9.98c-.4-.2-2.363-1.166-2.73-1.3-.366-.133-.633-.2-.9.2s-1.033 1.3-1.267 1.566c-.233.267-.466.3-.866.1-.4-.2-1.688-.622-3.215-1.984-1.188-1.059-1.99-2.368-2.223-2.768-.233-.4-.025-.616.175-.815.18-.179.4-.466.6-.7.2-.233.267-.4.4-.666.133-.267.067-.5-.033-.7-.1-.2-.9-2.167-1.233-2.967-.325-.78-.655-.674-.9-.686l-.766-.013c-.267 0-.7.1-1.067.5s-1.4 1.367-1.4 3.333 1.433 3.867 1.633 4.133c.2.267 2.82 4.307 6.833 6.033.955.412 1.7.658 2.28.842.958.305 1.83.262 2.519.159.768-.115 2.363-.966 2.696-1.9.333-.933.333-1.733.233-1.9-.1-.167-.366-.267-.766-.467Z" />
+      </svg>
+      <span className="font-semibold text-sm whitespace-nowrap">
+        Chat on WhatsApp
+      </span>
+    </a>
+  );
+}
+
 // ── App ───────────────────────────────────────────────────────────────────────
 export default function App() {
   return (
@@ -985,6 +1020,7 @@ export default function App() {
         <ContactSection />
       </main>
       <Footer />
+      <WhatsAppButton />
     </>
   );
 }
