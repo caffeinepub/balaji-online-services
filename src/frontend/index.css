@@ -1,0 +1,159 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Mona Sans - Display / UI headings */
+@font-face {
+  font-family: "Mona Sans";
+  src: url("/assets/fonts/Mona-Sans.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Plus Jakarta Sans - Body text */
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("/assets/fonts/PlusJakartaSans[wght].woff2") format("woff2");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Bricolage Grotesque - Accent headings */
+@font-face {
+  font-family: "Bricolage Grotesque";
+  src: url("/assets/fonts/BricolageGrotesque[opsz,wdth,wght].woff2") format("woff2");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  :root {
+    --radius: 0.75rem;
+
+    /* Core palette: Saffron orange primary + Deep indigo accent + Warm white */
+    --background: 0.98 0.008 85;
+    --foreground: 0.18 0.03 255;
+    --card: 1 0 0;
+    --card-foreground: 0.18 0.03 255;
+    --popover: 1 0 0;
+    --popover-foreground: 0.18 0.03 255;
+    --primary: 0.65 0.22 45;
+    --primary-foreground: 1 0 0;
+    --secondary: 0.35 0.12 255;
+    --secondary-foreground: 1 0 0;
+    --muted: 0.94 0.015 85;
+    --muted-foreground: 0.45 0.03 255;
+    --accent: 0.72 0.19 155;
+    --accent-foreground: 1 0 0;
+    --destructive: 0.577 0.245 27.325;
+    --destructive-foreground: 0.985 0 0;
+    --border: 0.88 0.02 85;
+    --input: 0.92 0.01 85;
+    --ring: 0.65 0.22 45;
+
+    /* Service card colors */
+    --service-1: 0.72 0.22 45;    /* Saffron orange */
+    --service-2: 0.55 0.18 255;   /* Royal blue */
+    --service-3: 0.62 0.19 155;   /* Teal */
+    --service-4: 0.68 0.2 350;    /* Rose/Pink */
+    --service-5: 0.6 0.21 125;    /* Green */
+    --service-6: 0.6 0.22 300;    /* Purple */
+    --service-7: 0.65 0.2 28;     /* Deep orange */
+    --service-8: 0.5 0.17 210;    /* Dark blue */
+    --service-9: 0.62 0.18 175;   /* Cyan */
+    --service-10: 0.72 0.2 85;    /* Yellow-green */
+    --service-11: 0.6 0.22 15;    /* Red-orange */
+    --service-12: 0.55 0.19 280;  /* Violet */
+    --service-13: 0.65 0.21 140;  /* Emerald */
+    --service-14: 0.68 0.2 60;    /* Amber */
+    --service-15: 0.52 0.18 230;  /* Indigo */
+    --service-16: 0.62 0.2 330;   /* Magenta */
+    --service-17: 0.58 0.21 35;   /* Burnt orange */
+    --service-18: 0.6 0.18 195;   /* Sky blue */
+    --service-19: 0.65 0.19 105;  /* Lime green */
+
+    --chart-1: 0.646 0.222 41.116;
+    --chart-2: 0.6 0.118 184.704;
+    --chart-3: 0.398 0.07 227.392;
+    --chart-4: 0.828 0.189 84.429;
+    --chart-5: 0.769 0.188 70.08;
+    --sidebar: 0.985 0 0;
+    --sidebar-foreground: 0.18 0.03 255;
+    --sidebar-primary: 0.65 0.22 45;
+    --sidebar-primary-foreground: 1 0 0;
+    --sidebar-accent: 0.94 0.015 85;
+    --sidebar-accent-foreground: 0.18 0.03 255;
+    --sidebar-border: 0.88 0.02 85;
+    --sidebar-ring: 0.65 0.22 45;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 16px;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: "Mona Sans", sans-serif;
+  }
+
+  .font-accent {
+    font-family: "Bricolage Grotesque", sans-serif;
+  }
+
+  /* Service card gradient helpers */
+  .service-gradient-1  { background: linear-gradient(135deg, oklch(var(--service-1)), oklch(0.55 0.2 45)); }
+  .service-gradient-2  { background: linear-gradient(135deg, oklch(var(--service-2)), oklch(0.42 0.16 255)); }
+  .service-gradient-3  { background: linear-gradient(135deg, oklch(var(--service-3)), oklch(0.5 0.17 155)); }
+  .service-gradient-4  { background: linear-gradient(135deg, oklch(var(--service-4)), oklch(0.55 0.18 350)); }
+  .service-gradient-5  { background: linear-gradient(135deg, oklch(var(--service-5)), oklch(0.48 0.19 125)); }
+  .service-gradient-6  { background: linear-gradient(135deg, oklch(var(--service-6)), oklch(0.48 0.2 300)); }
+  .service-gradient-7  { background: linear-gradient(135deg, oklch(var(--service-7)), oklch(0.52 0.18 28)); }
+  .service-gradient-8  { background: linear-gradient(135deg, oklch(var(--service-8)), oklch(0.38 0.15 210)); }
+  .service-gradient-9  { background: linear-gradient(135deg, oklch(var(--service-9)), oklch(0.5 0.16 175)); }
+  .service-gradient-10 { background: linear-gradient(135deg, oklch(var(--service-10)), oklch(0.58 0.18 85)); }
+  .service-gradient-11 { background: linear-gradient(135deg, oklch(var(--service-11)), oklch(0.48 0.2 15)); }
+  .service-gradient-12 { background: linear-gradient(135deg, oklch(var(--service-12)), oklch(0.42 0.17 280)); }
+  .service-gradient-13 { background: linear-gradient(135deg, oklch(var(--service-13)), oklch(0.52 0.19 140)); }
+  .service-gradient-14 { background: linear-gradient(135deg, oklch(var(--service-14)), oklch(0.55 0.18 60)); }
+  .service-gradient-15 { background: linear-gradient(135deg, oklch(var(--service-15)), oklch(0.4 0.16 230)); }
+  .service-gradient-16 { background: linear-gradient(135deg, oklch(var(--service-16)), oklch(0.5 0.18 330)); }
+  .service-gradient-17 { background: linear-gradient(135deg, oklch(var(--service-17)), oklch(0.46 0.19 35)); }
+  .service-gradient-18 { background: linear-gradient(135deg, oklch(var(--service-18)), oklch(0.48 0.16 195)); }
+  .service-gradient-19 { background: linear-gradient(135deg, oklch(var(--service-19)), oklch(0.52 0.17 105)); }
+
+  /* Hero gradient */
+  .hero-gradient {
+    background: linear-gradient(135deg,
+      oklch(0.35 0.15 255) 0%,
+      oklch(0.45 0.18 290) 25%,
+      oklch(0.62 0.22 45) 65%,
+      oklch(0.7 0.22 35) 100%
+    );
+  }
+
+  /* Notification gradient */
+  .notif-gradient {
+    background: linear-gradient(135deg,
+      oklch(0.18 0.05 255) 0%,
+      oklch(0.25 0.08 270) 100%
+    );
+  }
+
+  .text-shadow-glow {
+    text-shadow: 0 0 40px oklch(0.9 0.15 45 / 0.4);
+  }
+}
