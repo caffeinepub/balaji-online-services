@@ -27,13 +27,66 @@ import {
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
-import type { Notification } from "./backend.d";
-import {
-  useAddNotification,
-  useDeleteNotification,
-  useEditNotification,
-  useGetNotifications,
-} from "./hooks/useQueries";
+
+type Notification = {
+  id: number;
+  message: string;
+  dateLabel: string;
+  createdAt: number;
+};
+
+const STORAGE_KEY = "balaji_notifications";
+
+function useLocalNotifications() {
+  const load = (): Notification[] => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw) as Notification[];
+      return [...parsed].sort((a, b) => b.createdAt - a.createdAt);
+    } catch {
+      return [];
+    }
+  };
+
+  const [notifications, setNotifications] = useState<Notification[]>(load);
+
+  const save = (items: Notification[]) => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    setNotifications([...items].sort((a, b) => b.createdAt - a.createdAt));
+  };
+
+  const addNotification = (message: string, dateLabel: string) => {
+    const current = load();
+    const newItem: Notification = {
+      id: Date.now(),
+      message,
+      dateLabel,
+      createdAt: Date.now(),
+    };
+    save([...current, newItem]);
+  };
+
+  const editNotification = (id: number, message: string, dateLabel: string) => {
+    const current = load();
+    const updated = current.map((n) =>
+      n.id === id ? { ...n, message, dateLabel } : n,
+    );
+    save(updated);
+  };
+
+  const deleteNotification = (id: number) => {
+    const current = load();
+    save(current.filter((n) => n.id !== id));
+  };
+
+  return {
+    notifications,
+    addNotification,
+    editNotification,
+    deleteNotification,
+  };
+}
 
 const ADMIN_PASSWORD = "design2026";
 
@@ -360,7 +413,7 @@ function NotificationItem({
   index: number;
   adminUnlocked: boolean;
   onEdit: (n: Notification) => void;
-  onDelete: (id: bigint) => void;
+  onDelete: (id: number) => void;
   isDeleting: boolean;
 }) {
   return (
@@ -423,10 +476,13 @@ function NotificationItem({
 }
 
 function NotificationsSection() {
-  const { data: notifications = [], isLoading } = useGetNotifications();
-  const addMutation = useAddNotification();
-  const editMutation = useEditNotification();
-  const deleteMutation = useDeleteNotification();
+  const {
+    notifications,
+    addNotification,
+    editNotification,
+    deleteNotification,
+  } = useLocalNotifications();
+  const isLoading = false;
 
   const [adminOpen, setAdminOpen] = useState(false);
   const [adminUnlocked, setAdminUnlocked] = useState(false);
@@ -435,11 +491,13 @@ function NotificationsSection() {
 
   const [newMessage, setNewMessage] = useState("");
   const [newDateLabel, setNewDateLabel] = useState("");
+  const [isAdding, setIsAdding] = useState(false);
 
   const [editingNotif, setEditingNotif] = useState<Notification | null>(null);
   const [editMessage, setEditMessage] = useState("");
   const [editDateLabel, setEditDateLabel] = useState("");
-  const [deletingId, setDeletingId] = useState<bigint | null>(null);
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const handlePasswordSubmit = () => {
     if (passwordInput === ADMIN_PASSWORD) {
@@ -450,7 +508,7 @@ function NotificationsSection() {
     }
   };
 
-  const handleAddNotification = async () => {
+  const handleAddNotification = () => {
     if (!newMessage.trim()) {
       toast.error("Please enter a message");
       return;
@@ -459,17 +517,16 @@ function NotificationsSection() {
       toast.error("Please enter a date label");
       return;
     }
+    setIsAdding(true);
     try {
-      await addMutation.mutateAsync({
-        password: ADMIN_PASSWORD,
-        message: newMessage.trim(),
-        dateLabel: newDateLabel.trim(),
-      });
+      addNotification(newMessage.trim(), newDateLabel.trim());
       setNewMessage("");
       setNewDateLabel("");
       toast.success("Notification added successfully!");
     } catch {
       toast.error("Failed to add notification. Please try again.");
+    } finally {
+      setIsAdding(false);
     }
   };
 
@@ -479,26 +536,28 @@ function NotificationsSection() {
     setEditDateLabel(n.dateLabel);
   };
 
-  const handleEditSave = async () => {
+  const handleEditSave = () => {
     if (!editingNotif) return;
+    setIsSavingEdit(true);
     try {
-      await editMutation.mutateAsync({
-        password: ADMIN_PASSWORD,
-        id: editingNotif.id,
-        message: editMessage.trim(),
-        dateLabel: editDateLabel.trim(),
-      });
+      editNotification(
+        editingNotif.id,
+        editMessage.trim(),
+        editDateLabel.trim(),
+      );
       setEditingNotif(null);
       toast.success("Notification updated!");
     } catch {
       toast.error("Failed to update notification.");
+    } finally {
+      setIsSavingEdit(false);
     }
   };
 
-  const handleDelete = async (id: bigint) => {
+  const handleDelete = (id: number) => {
     setDeletingId(id);
     try {
-      await deleteMutation.mutateAsync({ password: ADMIN_PASSWORD, id });
+      deleteNotification(id);
       toast.success("Notification deleted.");
     } catch {
       toast.error("Failed to delete notification.");
@@ -583,7 +642,7 @@ function NotificationsSection() {
           <div data-ocid="notifications.list" className="flex flex-col gap-3">
             {notifications.map((n, i) => (
               <NotificationItem
-                key={n.id.toString()}
+                key={n.id}
                 notification={n}
                 index={i}
                 adminUnlocked={adminUnlocked}
@@ -688,10 +747,10 @@ function NotificationsSection() {
                 <Button
                   data-ocid="admin.add_notification.submit_button"
                   onClick={handleAddNotification}
-                  disabled={addMutation.isPending}
+                  disabled={isAdding}
                   className="w-full bg-green-500 hover:bg-green-400 text-white font-bold border-0"
                 >
-                  {addMutation.isPending ? (
+                  {isAdding ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                       Adding...
@@ -714,7 +773,7 @@ function NotificationsSection() {
                   <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
                     {notifications.map((n, i) => (
                       <div
-                        key={n.id.toString()}
+                        key={n.id}
                         className="bg-white/5 rounded-xl p-3 border border-white/10"
                       >
                         {editingNotif?.id === n.id ? (
@@ -735,11 +794,11 @@ function NotificationsSection() {
                             <div className="flex gap-2">
                               <Button
                                 onClick={handleEditSave}
-                                disabled={editMutation.isPending}
+                                disabled={isSavingEdit}
                                 size="sm"
                                 className="flex-1 bg-blue-500 hover:bg-blue-400 text-white font-bold border-0"
                               >
-                                {editMutation.isPending ? (
+                                {isSavingEdit ? (
                                   <Loader2 className="w-3 h-3 animate-spin" />
                                 ) : (
                                   "Save"
