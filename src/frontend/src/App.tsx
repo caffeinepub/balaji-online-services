@@ -25,7 +25,7 @@ import {
   X,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 type Notification = {
@@ -147,7 +147,7 @@ function Navbar() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 select-none">
             <span className="text-2xl">🙏</span>
             <span className="font-display font-bold text-lg sm:text-xl text-foreground">
               Balaji Online Services
@@ -475,7 +475,13 @@ function NotificationItem({
   );
 }
 
-function NotificationsSection() {
+function NotificationsSection({
+  adminOpen,
+  setAdminOpen,
+}: {
+  adminOpen: boolean;
+  setAdminOpen: (v: boolean) => void;
+}) {
   const {
     notifications,
     addNotification,
@@ -484,7 +490,6 @@ function NotificationsSection() {
   } = useLocalNotifications();
   const isLoading = false;
 
-  const [adminOpen, setAdminOpen] = useState(false);
   const [adminUnlocked, setAdminUnlocked] = useState(false);
   const [passwordInput, setPasswordInput] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -498,6 +503,16 @@ function NotificationsSection() {
   const [editDateLabel, setEditDateLabel] = useState("");
   const [isSavingEdit, setIsSavingEdit] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+
+  // Reset login state each time admin panel is opened
+  useEffect(() => {
+    if (adminOpen) {
+      setAdminUnlocked(false);
+      setPasswordInput("");
+      setPasswordError("");
+      setEditingNotif(null);
+    }
+  }, [adminOpen]);
 
   const handlePasswordSubmit = () => {
     if (passwordInput === ADMIN_PASSWORD) {
@@ -586,7 +601,7 @@ function NotificationsSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10"
+          className="mb-10"
         >
           <div>
             <span className="inline-block bg-amber-400/20 text-amber-300 font-semibold text-sm px-4 py-2 rounded-full mb-3">
@@ -599,15 +614,6 @@ function NotificationsSection() {
               Stay updated with the latest announcements
             </p>
           </div>
-
-          <Button
-            data-ocid="notifications.admin_button"
-            onClick={() => setAdminOpen(true)}
-            className="self-start sm:self-auto flex items-center gap-2 bg-amber-400 hover:bg-amber-300 text-gray-900 font-bold rounded-full px-5 py-2 border-0 flex-shrink-0"
-          >
-            <ShieldCheck className="w-4 h-4" />
-            Admin Login
-          </Button>
         </motion.div>
 
         {/* Loading */}
@@ -1067,16 +1073,47 @@ function WhatsAppButton() {
 }
 
 // ── App ───────────────────────────────────────────────────────────────────────
+function isAdminRoute(): boolean {
+  return (
+    window.location.hash === "#/admin" ||
+    window.location.pathname.endsWith("/admin") ||
+    window.location.search.includes("admin")
+  );
+}
+
 export default function App() {
+  const [adminOpen, setAdminOpen] = useState(() => isAdminRoute());
+
+  // Listen for hash changes (e.g. user types #/admin in address bar)
+  useEffect(() => {
+    const handleHashChange = () => {
+      if (isAdminRoute()) setAdminOpen(true);
+    };
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
+
+  const handleAdminClose = () => {
+    setAdminOpen(false);
+    // Clean the URL so visitors don't see /admin in the address bar
+    window.history.replaceState(null, "", window.location.pathname);
+  };
+
   return (
     <>
       <Toaster position="top-right" richColors />
       <Navbar />
       <main>
         <HeroSection />
-        <ServicesSection />
-        <NotificationsSection />
         <ContactSection />
+        <ServicesSection />
+        <NotificationsSection
+          adminOpen={adminOpen}
+          setAdminOpen={(v) => {
+            if (!v) handleAdminClose();
+            else setAdminOpen(true);
+          }}
+        />
       </main>
       <Footer />
       <WhatsAppButton />
